@@ -2,6 +2,8 @@
 
 Slackbot that keeps track of your coworkers' whereabouts
 
+First experiment with slackbots...
+
 ## Comments
 
 ### Async handling
@@ -12,4 +14,4 @@ or maybe this project wasn't quite suited for this experiment. Anyhow...
 
 ### Functional approach
 Also trying out a more functional approach but didn't go anywhere near the whole hog
-so you're looking at a mongrel mix of (poor) functional code and normal OOP.
+so you're looking at a mix of (poor) functional code and (decent) OOP.
