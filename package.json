@@ -1,0 +1,29 @@
+{
+  "name": "wherebot",
+  "version": "0.0.1",
+  "description": "Slackbot that keeps track of your coworkers' whereabouts",
+  "main": "src/app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/monkybrain/wherebot.git"
+  },
+  "keywords": [
+    "slackbot"
+  ],
+  "author": "Philip Prophet (monkybrain)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/monkybrain/wherebot/issues"
+  },
+  "homepage": "https://github.com/monkybrain/wherebot#readme",
+  "dependencies": {
+    "firebase": "^2.4.2",
+    "node-wit": "^2.0.0",
+    "ramda": "^0.20.1",
+    "rx": "^4.1.0",
+    "slack": "^6.1.0"
+  }
+}
