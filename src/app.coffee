@@ -37,7 +37,7 @@ Wit.bundle$.subscribe (bundle) ->
 
 
 
-# Tap here to debug! (nothing -> log)
+# Tap here to debug! (uncomment lines below)
 # Slack.incoming.message$.do(log).subscribe()
 # Wit.outcome$.do(log)
 # Database.response$.do(log).subscribe()

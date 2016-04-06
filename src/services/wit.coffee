@@ -28,5 +28,5 @@ processMessage = (message, state) ->
       bundle$.onNext bundle
 
 module.exports =
-  bundle$: bundle$
+  bundle$: bundle$.share()
   processMessage: processMessage

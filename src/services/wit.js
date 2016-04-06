@@ -50,7 +50,7 @@
   };
 
   module.exports = {
-    bundle$: bundle$,
+    bundle$: bundle$.share(),
     processMessage: processMessage
   };
 

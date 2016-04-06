@@ -36,6 +36,8 @@ incoming.message$ =
   .where userIsnt self
   # ...and convert message text to lower case (except tags, e.g. <@U0ABCDEF>)
   .map messageTextToLowerCaseExceptTags
+  # and make steam 'hot'
+  .share()
 
 # Collection of outgoing streams
 outgoing = {}

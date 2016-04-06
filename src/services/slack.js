@@ -31,7 +31,7 @@
     });
   });
 
-  incoming.message$ = incoming.event$.where(typeIs('message')).where(userIsnt(self)).map(messageTextToLowerCaseExceptTags);
+  incoming.message$ = incoming.event$.where(typeIs('message')).where(userIsnt(self)).map(messageTextToLowerCaseExceptTags).share();
 
   outgoing = {};
 
