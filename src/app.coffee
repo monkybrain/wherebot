@@ -7,7 +7,13 @@ Wit = require './services/wit'
 Database = require './services/database'
 {log} = require './misc/util'
 {getUserState} = require './services/database'
-{processBundle} = require './processes/bundle'
+{processBundle} = require './internal/process'
+
+
+
+### STREAMS ###
+
+# SLACK
 
 # On incoming slack message
 Slack.incoming.message$.subscribe (message) =>
@@ -18,9 +24,12 @@ Slack.incoming.message$.subscribe (message) =>
   # Send message and state to wit.ai
   .then (state) => Wit.processMessage message, state
 
-# On receiving bundle of original message and outcome from wit.ai -> process outcome
-Wit.outcome$.subscribe (bundle) ->
+# WIT.AI
 
+# On incoming bundle (message + outcome from wit.ai)
+Wit.bundle$.subscribe (bundle) ->
+
+  # Process bundle
   processBundle bundle
 
   # Send reply

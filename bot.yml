@@ -1,0 +1,7 @@
+name: Wherebot
+description: Keeps track of your coworkers' whereabouts
+config:
+  - name: WIT_TOKEN
+    friendly_name: Token for wit.ai
+    type: SECRET
+    global: true

@@ -14,7 +14,10 @@
 
   getUserState = require('./services/database').getUserState;
 
-  processBundle = require('./processes/bundle').processBundle;
+  processBundle = require('./internal/process').processBundle;
+
+
+  /* STREAMS */
 
   Slack.incoming.message$.subscribe((function(_this) {
     return function(message) {
@@ -24,7 +27,7 @@
     };
   })(this));
 
-  Wit.outcome$.subscribe(function(bundle) {
+  Wit.bundle$.subscribe(function(bundle) {
     return processBundle(bundle).then((function(_this) {
       return function(bundle) {
         return Slack.send(bundle);

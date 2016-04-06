@@ -14,7 +14,7 @@ makeStateObject = (state) -> {context: {state: state}}
 ### PUBLIC ###
 
 # Stream of wit.ai outcomes
-outcome$ = new Rx.Subject()
+bundle$ = new Rx.Subject()
 
 # Process incoming slack message
 processMessage = (message, state) ->
@@ -22,11 +22,11 @@ processMessage = (message, state) ->
   # Send message to wit.ai for processing...
   wit.captureTextIntent token, getText(message), makeStateObject(state), (err, res) =>
 
-    # ...then push bundle of incoming message and outcome to stream (unless undefined)
+    # ...then push bundle of incoming message and outcome to stream (unless no outcome)
     if arrayNotEmpty(res.outcomes)
       bundle = message: message, outcome: res.outcomes[0]
-      outcome$.onNext bundle
+      bundle$.onNext bundle
 
 module.exports =
-  outcome$: outcome$
+  bundle$: bundle$
   processMessage: processMessage

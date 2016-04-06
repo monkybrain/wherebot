@@ -3,42 +3,11 @@ Promise = require 'promise'
 
 {log} = require '../misc/util'
 {setUserStatus, setUserState} = require '../services/database'
+{replies, queries} = require './phrases'
+{intents} = require './intents'
 
 ### PRIVATE ###
 parseEntities = R.compose R.map(R.prop('value')), R.map(R.nth(0))
-
-# Replies
-replies =
-  intents:
-    unknown: "Sorry, didn't quite get that. Could you please rephrase that?"
-    set_self_status: "Ok, got it!"
-
-# Queries
-queries =
-  back: "When do you expect to be back?"
-
-# Intents
-intents =
-  'set_self_status': (message, entities) ->
-
-    # Write new status to database
-    setUserStatus message, entities
-
-    # Reply = array of sentences
-    reply = [replies.intents.set_self_status]
-
-    # If 'back' not specified
-    if not entities.back?
-      # -> Set user state to 'bot_query_back'
-      setUserState message, 'bot_query_back'
-      # -> Add query to reply
-      reply.push [queries.back]
-
-    # Else -> set user state to 'idle'
-    else setUserState message, 'idle'
-
-    # Join array to single string
-    reply.join "\n"
 
 processIntent = (intent, message, entities) ->
 

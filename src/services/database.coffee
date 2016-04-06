@@ -19,7 +19,6 @@ getStatus = dot('status')
 getUserRef = (teamId, userId) -> teams.child(teamId).child('users/' + userId)
 getUserStateRef = (teamId, userId) -> getUserRef(teamId, userId).child('state')
 getUserStatusRef = (teamId, userId) -> getUserRef(teamId, userId).child('status')
-
 makeUserObject = (userId, snapshot) ->
   user = {}
   user[userId] = snapshot.val()
@@ -30,7 +29,7 @@ makeUserObject = (userId, snapshot) ->
 # STREAM
 response$ = new Rx.Subject()
 
-# GET -> User state
+# GET
 getUserState = (message) ->
 
   new Promise (resolve, reject) =>
