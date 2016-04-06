@@ -16,20 +16,20 @@
 
   processBundle = require('./processes/bundle').processBundle;
 
-  Slack.incoming.message$.subscribe(function(message) {
-    return getUserState(message).then(function(state) {
-      return Wit.processMessage(message, state);
-    }).then(function(bundle) {
-      return processBundle(bundle);
-    });
+  Slack.incoming.message$.subscribe((function(_this) {
+    return function(message) {
+      return getUserState(message).then(function(state) {
+        return Wit.processMessage(message, state);
+      });
+    };
+  })(this));
+
+  Wit.outcome$.subscribe(function(bundle) {
+    return processBundle(bundle).then((function(_this) {
+      return function(bundle) {
+        return Slack.send(bundle);
+      };
+    })(this));
   });
-
-
-  /*
-   * On receiving bundle of original message and outcome from wit.ai -> process outcome
-  Wit.outcome$.subscribe (bundle) ->
-  
-    processBundle bundle
-   */
 
 }).call(this);

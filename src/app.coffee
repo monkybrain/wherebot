@@ -9,30 +9,26 @@ Database = require './services/database'
 {getUserState} = require './services/database'
 {processBundle} = require './processes/bundle'
 
-# On incoming slack message -> get user state and send message + state to wit.ai for processing
-Slack.incoming.message$.subscribe (message) ->
+# On incoming slack message
+Slack.incoming.message$.subscribe (message) =>
 
-  # Fetch user state from database...
+  # Fetch user state from database
   getUserState(message)
 
   # Send message and state to wit.ai
-  .then (state) -> Wit.processMessage message, state
+  .then (state) => Wit.processMessage message, state
 
-  # Process user input
-  .then (bundle) -> processBundle bundle
-
-  # Send reply
-  # .then (bundle) -> Slack.send bundle
-
-###
 # On receiving bundle of original message and outcome from wit.ai -> process outcome
 Wit.outcome$.subscribe (bundle) ->
 
   processBundle bundle
-###
+
+  # Send reply
+  .then (bundle) => Slack.send bundle
+
 
 
 # Tap here to debug! (nothing -> log)
-# Slack.incoming.message$.do(log)
+# Slack.incoming.message$.do(log).subscribe()
 # Wit.outcome$.do(log)
 # Database.response$.do(log).subscribe()

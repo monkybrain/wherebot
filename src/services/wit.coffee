@@ -23,8 +23,10 @@ processMessage = (message, state) ->
   wit.captureTextIntent token, getText(message), makeStateObject(state), (err, res) =>
 
     # ...then push bundle of incoming message and outcome to stream (unless undefined)
-    if arrayNotEmpty(res.outcomes) then outcome$.onNext message: message, outcome: res.outcomes[0]
+    if arrayNotEmpty(res.outcomes)
+      bundle = message: message, outcome: res.outcomes[0]
+      outcome$.onNext bundle
 
 module.exports =
-  outcome$: outcome$.share()
+  outcome$: outcome$
   processMessage: processMessage

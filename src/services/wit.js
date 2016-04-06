@@ -37,18 +37,20 @@
   processMessage = function(message, state) {
     return wit.captureTextIntent(token, getText(message), makeStateObject(state), (function(_this) {
       return function(err, res) {
+        var bundle;
         if (arrayNotEmpty(res.outcomes)) {
-          return outcome$.onNext({
+          bundle = {
             message: message,
             outcome: res.outcomes[0]
-          });
+          };
+          return outcome$.onNext(bundle);
         }
       };
     })(this));
   };
 
   module.exports = {
-    outcome$: outcome$.share(),
+    outcome$: outcome$,
     processMessage: processMessage
   };
 
