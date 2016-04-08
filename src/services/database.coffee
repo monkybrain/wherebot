@@ -71,14 +71,14 @@ exports.setUserStatus = R.curry R.pipe(getUserStatusRef, setValue)
 
 ### TEST ###
 
-message =
+###message =
   user: 'U036HR7S2'
   team: 'T02FHSL18'
 
 # log addId status: 'fisk', message
 # exports.setUserState message, 'idle'
 exports.getUserState(message)
-.then log
+.then log###
 
 
 
