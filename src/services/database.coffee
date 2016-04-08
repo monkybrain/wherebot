@@ -19,19 +19,24 @@ getUserId = dot('user')
 getStatus = dot('status')
 
 # Handle refs and children
+getChild = R.curry (name, ref) -> ref.child(name)
 getUserRef = (message) -> teams.child(getTeamId(message)).child('users/' + getUserId(message))
-getUserStateRef = (message) -> getUserRef(message).child('state')
-getUserStatusRef = (message) -> getUserRef(message).child('status')
-getUserBackRef = (message) -> getUserRef(message).child('back')
-getUserBackDateTimeRef = (message) -> getUserRef(message).child('backDateTime')
+# getTeamRef = R.pipe getTeamId, getChild(teams)
+getUserStateRef = R.pipe getUserRef, getChild('state')
+getUserStatusRef = R.pipe getUserRef, getChild('status')
+getUserBackRef = R.pipe getUserRef, getChild('back')
+getUserBackDateTimeRef = R.pipe getUserRef, getChild('backDateTime')
+
+### PLAYGROUND ###
+
 
 # GET helpers
 getSnapshot = (ref) -> ref.once 'value'
 snapshotToValue = (snapshot) -> snapshot.val()
-getValue = R.pipeP getSnapshot, snapshotToValue
 addId = (value, message) -> R.merge value, id: getUserId(message) # To be implemented
-defaultTo = R.curry (defaultValue, val) -> if not val? then defaultValue else val
+getValue = R.pipeP getSnapshot, snapshotToValue
 getValueWithDefault = (defaultValue) -> R.pipeP getValue, defaultTo(defaultValue)
+defaultTo = R.curry (defaultValue, val) -> if not val? then defaultValue else val
 
 # SET helpers
 setValue = (value, ref) -> ref.set value
@@ -57,13 +62,16 @@ exports.setUserBack = (message, state) -> setValue(state, getUserBackRef(message
 exports.setUserStatus = (message, state) -> setValue(state, getUserStatusRef(message))
 
 ### TEST ###
-###
+
 message =
   user: 'U036HR7S2'
   team: 'T02FHSL18'
 
 # log addId status: 'fisk', message
 
-exports.getUserStatus(message)
+
+
+# getUserStateRef = R.pipe getUserRef, getChild('status')
+exports.getUserBack(message)
 .then log
-###
+
