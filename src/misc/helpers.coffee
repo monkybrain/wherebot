@@ -25,10 +25,12 @@ userIsnt = (userId) -> R.pipe dot('user'), R.equals(userId), R.not
 
 # [GET] Object -> String -> Value/Object
 dot = (key) -> (obj) -> if obj[key]? then obj[key] else undefined
+method = dot
 
 ### PUBLIC ###
 module.exports =
   dot: dot
+  method: method
   slack:
     userIsnt: userIsnt
     typeIs: typeIs

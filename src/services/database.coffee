@@ -5,7 +5,7 @@ Rx = require 'rx'
 
 
 # My modules
-{dot} = require '../misc/helpers'
+{dot, method} = require '../misc/helpers'
 {log} = require '../misc/util'
 
 base = new Firebase 'https://werebot.firebaseio.com/'
@@ -21,25 +21,32 @@ getStatus = dot('status')
 # Handle refs and children
 getChild = R.curry (name, ref) -> ref.child(name)
 getUserRef = (message) -> teams.child(getTeamId(message)).child('users/' + getUserId(message))
-# getTeamRef = R.pipe getTeamId, getChild(teams)
+getTeamRef = R.pipe getTeamId, getChild(teams)
 getUserStateRef = R.pipe getUserRef, getChild('state')
 getUserStatusRef = R.pipe getUserRef, getChild('status')
 getUserBackRef = R.pipe getUserRef, getChild('back')
 getUserBackDateTimeRef = R.pipe getUserRef, getChild('backDateTime')
 
-### PLAYGROUND ###
-
-
-# GET helpers
+# GET
+# Firebase Ref -> Snapshot
 getSnapshot = (ref) -> ref.once 'value'
+
+# Snapshot to value (Firebase Snapshot -> Object)
 snapshotToValue = (snapshot) -> snapshot.val()
-addId = (value, message) -> R.merge value, id: getUserId(message) # To be implemented
+
+# Get Value (Firebase Ref -> Object)
 getValue = R.pipeP getSnapshot, snapshotToValue
-getValueWithDefault = (defaultValue) -> R.pipeP getValue, defaultTo(defaultValue)
+
+addId = (value, message) -> R.merge value, id: getUserId(message) # To be implemented
+
 defaultTo = R.curry (defaultValue, val) -> if not val? then defaultValue else val
 
+# Get Value With Default (Firebase Ref -> String -> String)
+getValueWithDefault = (defaultValue) -> R.pipeP getValue, defaultTo(defaultValue)
+
 # SET helpers
-setValue = (value, ref) -> ref.set value
+# setValue = (value, ref) -> ref.set value
+setValue = R.curry (value, ref) -> ref.set value
 
 # MISC helpers
 makeUserObject = (userId, snapshot) ->
@@ -56,10 +63,11 @@ exports.getUserStatus = R.pipe getUserStatusRef, getValue
 exports.getUserBack = R.pipe getUserBackRef, getValue
 
 # SET
-# I smell curry here, but can't quite figure it out...
-exports.setUserState = (message, state) -> setValue(state, getUserStateRef(message))
-exports.setUserBack = (message, state) -> setValue(state, getUserBackRef(message))
-exports.setUserStatus = (message, state) -> setValue(state, getUserStatusRef(message))
+# TODO: Curry the rest (and work out how to to do it nicely...)
+exports.setUserState = (message, value) -> setValue(value, getUserStateRef(message))
+exports.setUserBack = (message, value) -> setValue(value, getUserBackRef(message))
+# exports.setUserStatus = (message, value) -> setValue(value, getUserStatusRef(message))
+exports.setUserStatus = R.curry R.pipe(getUserStatusRef, setValue)
 
 ### TEST ###
 
@@ -68,10 +76,9 @@ message =
   team: 'T02FHSL18'
 
 # log addId status: 'fisk', message
-
-
-
-# getUserStateRef = R.pipe getUserRef, getChild('status')
-exports.getUserBack(message)
+# exports.setUserState message, 'idle'
+exports.getUserState(message)
 .then log
+
+
 
