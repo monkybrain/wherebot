@@ -12,16 +12,31 @@ base = new Firebase 'https://werebot.firebaseio.com/'
 teams = base.child 'teams'
 
 ### PRIVATE ###
+
+# Parse message
 getTeamId = dot('team')
 getUserId = dot('user')
 getStatus = dot('status')
 
-getUserRef = (teamId, userId) -> teams.child(teamId).child('users/' + userId)
-getUserStateRef = (teamId, userId) -> getUserRef(teamId, userId).child('state')
-getUserStatusRef = (teamId, userId) -> getUserRef(teamId, userId).child('status')
-getUserBackRef = (teamId, userId) -> getUserRef(teamId, userId).child('back')
-getUserBackDateTimeRef = (teamId, userId) -> getUserRef(teamId, userId).child('backDateTime')
+# Handle refs and children
+getUserRef = (message) -> teams.child(getTeamId(message)).child('users/' + getUserId(message))
+getUserStateRef = (message) -> getUserRef(message).child('state')
+getUserStatusRef = (message) -> getUserRef(message).child('status')
+getUserBackRef = (message) -> getUserRef(message).child('back')
+getUserBackDateTimeRef = (message) -> getUserRef(message).child('backDateTime')
 
+# GET helpers
+getSnapshot = (ref) -> ref.once 'value'
+snapshotToValue = (snapshot) -> snapshot.val()
+getValue = R.pipeP getSnapshot, snapshotToValue
+addId = (value, message) -> R.merge value, id: getUserId(message) # To be implemented
+defaultTo = R.curry (defaultValue, val) -> if not val? then defaultValue else val
+getValueWithDefault = (defaultValue) -> R.pipeP getValue, defaultTo(defaultValue)
+
+# SET helpers
+setValue = (value, ref) -> ref.set value
+
+# MISC helpers
 makeUserObject = (userId, snapshot) ->
   user = {}
   user[userId] = snapshot.val()
@@ -29,79 +44,26 @@ makeUserObject = (userId, snapshot) ->
 
 ### PUBLIC ###
 
-# STREAM
-response$ = new Rx.Subject()
-
-# GET: User
-getUser = (message) =>
-
-  new Promise (resolve, reject) =>
-
-    # Get user state
-    getUserRef(getTeamId(message), getUserId(message)).once 'value', (snapshot) =>
-
-      user = R.merge snapshot.val(), id: getUserId(message)
-
-      # Resolve user
-      resolve user
-
-      # Push to response stream
-      # response$.onNext makeUserObject(getUserId(message), snapshot)
-
-# GET: User state
-getUserState = (message) =>
-
-  new Promise (resolve, reject) =>
-
-    # Get user state
-    getUserStateRef(getTeamId(message), getUserId(message)).once 'value', (snapshot) =>
-
-      # If no record, default to 'idle'
-      state = if not snapshot.val()? then 'idle' else snapshot.val()
-
-      # Resolve state
-      resolve state
-
-      # Push to response stream
-      response$.onNext state
-
-# GET: User status
-getUserStatus = (message) =>
-
-  new Promise (resolve, reject) =>
-
-    # Get user status
-    getUserStatusRef(getTeamId(message), getUserId(message)).once 'value', (snapshot) =>
-
-      # Get status from snapshot
-      status = snapshot.val()
-
-      log status
-
-      # Resolve status
-      resolve status
-
-      # Push to response stream
-      response$.onNext status
+# GET
+exports.getUser = R.pipe getUserRef, getValue
+exports.getUserState = R.pipe getUserStateRef, getValueWithDefault('idle')
+exports.getUserStatus = R.pipe getUserStatusRef, getValue
+exports.getUserBack = R.pipe getUserBackRef, getValue
 
 # SET
-setUserStatus = (message, status) -> getUserStatusRef(getTeamId(message), getUserId(message)).set status
-setUserState = (message, state) -> getUserStateRef(getTeamId(message), getUserId(message)).set state
-setUserBack = (message, back) -> getUserBackRef(getTeamId(message), getUserId(message)).set back
-setUserBackDateTime = (message, backDateTime) -> getUserBackDateTimeRef(getTeamId(message), getUserId(message)).set backDateTime
-
-module.exports =
-  response$: response$.share()
-  getUserState: getUserState
-  getUser: getUser
-  setUserStatus: setUserStatus
-  setUserState: setUserState
-  setUserBack: setUserBack
-  setUserBackDateTime: setUserBackDateTime
+# I smell curry here, but can't quite figure it out...
+exports.setUserState = (message, state) -> setValue(state, getUserStateRef(message))
+exports.setUserBack = (message, state) -> setValue(state, getUserBackRef(message))
+exports.setUserStatus = (message, state) -> setValue(state, getUserStatusRef(message))
 
 ### TEST ###
+###
 message =
-  team: 'T0123'
-  user: 'U0ABC'
-entities =
-  status: 'at work'
+  user: 'U036HR7S2'
+  team: 'T02FHSL18'
+
+# log addId status: 'fisk', message
+
+exports.getUserStatus(message)
+.then log
+###
