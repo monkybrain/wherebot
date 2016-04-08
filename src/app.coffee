@@ -9,8 +9,6 @@ Database = require './services/database'
 {getUserState} = require './services/database'
 {processBundle} = require './internal/process'
 
-
-
 ### STREAMS ###
 
 # SLACK
@@ -22,7 +20,7 @@ Slack.incoming.message$.subscribe (message) =>
   getUserState(message)
 
   # Send message and state to wit.ai
-  .then (state) => Wit.processMessage message, state
+  .then (state) -> Wit.processMessage(message, state)
 
 # WIT.AI
 
@@ -30,14 +28,16 @@ Slack.incoming.message$.subscribe (message) =>
 Wit.bundle$.subscribe (bundle) ->
 
   # Process bundle
-  processBundle bundle
+  processBundle(bundle)
 
   # Send reply
-  .then (bundle) => Slack.send bundle
-
+  .then (bundle) ->
+    log bundle.reply
+    Slack.send bundle
 
 
 # Tap here to debug! (uncomment lines below)
-# Slack.incoming.message$.do(log).subscribe()
-# Wit.outcome$.do(log)
+# Slack.incoming.message$.do(log)
+# Slack.incoming.event$.do(log)
+# Wit.bundle$.do(log)
 # Database.response$.do(log).subscribe()

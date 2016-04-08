@@ -11,10 +11,14 @@ parseEntities = R.compose R.map(R.prop('value')), R.map(R.nth(0))
 
 processIntent = (intent, message, entities) ->
 
-  # If existing intent -> perform operation
-  if intents[intent]? then intents[intent] message, entities
-  # Else -> log
-  else console.error "intent not found"
+  # If existing intent
+  if intents[intent]?
+
+    # -> perform operation
+    return intents[intent](message, entities)
+
+  # Else -> log (TODO: Proper error handling needed)
+  # else console.error "intent not found"
 
 ### PUBLIC ###
 
@@ -28,14 +32,19 @@ processBundle = (bundle) ->
     {intent, confidence} = outcome
     entities = parseEntities(outcome.entities)
 
-    # If confidence low -> ask user to rephrase
+    # If confidence low -> set intent to unknown
     if confidence < 0.5 or intent is 'UNKNOWN'
-      reply = replies.intents.unknown
+      console.log "Low confidence: " + confidence
+      intent = 'unknown'
 
     # Else process intent
-    else reply = processIntent intent, message, entities
+    processIntent(intent, message, entities)
 
-    resolve R.merge bundle, reply: reply
+    .then (reply) =>
+      log reply
+      resolve R.merge bundle, reply: reply
+
+
 
 module.exports =
   processBundle: processBundle

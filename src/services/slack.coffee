@@ -6,13 +6,20 @@ Rx = require 'rx';
 {messageTextToLowerCaseExceptTags, typeIs, userIsnt} = require('../misc/helpers').slack
 {log} = require '../misc/util'
 
+nullBack = (err, data) ->
+
 # Constants
 token = process.env.SLACK_TOKEN
 self = 'U0WRAJMB5'
 
 # Initialize and run slackbot
+
 bot = slack.rtm.client()
-bot.listen({token})
+bot.listen {token}
+
+# Greeting
+bot.hello (message) ->
+  slack.chat.postMessage {token: token, channel: 'D0WSS7VGQ', text: "Hi there. Looking for someone? Or perhaps you'd like to share your whereabouts?", as_user: true}, nullBack
 
 ### PUBLIC ###
 
@@ -47,12 +54,10 @@ outgoing.message$ = new Rx.Subject()
 
 # EXPORT: Send message to Slack
 send = (bundle) ->
-  log bundle
-  ###{message, reply} = bundle
-  bot.chat.postMessage {token: token, channel: message.channel, text: reply}, log###
+  {message, reply} = bundle
+  slack.chat.postMessage {token: token, channel: message.channel, text: reply, as_user: true}, nullBack
 
 module.exports =
   incoming: incoming
   outgoing: outgoing
   send: send
-

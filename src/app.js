@@ -28,11 +28,10 @@
   })(this));
 
   Wit.bundle$.subscribe(function(bundle) {
-    return processBundle(bundle).then((function(_this) {
-      return function(bundle) {
-        return Slack.send(bundle);
-      };
-    })(this));
+    return processBundle(bundle).then(function(bundle) {
+      log(bundle.reply);
+      return Slack.send(bundle);
+    });
   });
 
 }).call(this);

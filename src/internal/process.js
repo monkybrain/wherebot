@@ -22,8 +22,6 @@
   processIntent = function(intent, message, entities) {
     if (intents[intent] != null) {
       return intents[intent](message, entities);
-    } else {
-      return console.error("intent not found");
     }
   };
 
@@ -33,18 +31,20 @@
   processBundle = function(bundle) {
     return new Promise((function(_this) {
       return function(resolve, reject) {
-        var confidence, entities, intent, message, outcome, reply;
+        var confidence, entities, intent, message, outcome;
         message = bundle.message, outcome = bundle.outcome;
         intent = outcome.intent, confidence = outcome.confidence;
         entities = parseEntities(outcome.entities);
         if (confidence < 0.5 || intent === 'UNKNOWN') {
-          reply = replies.intents.unknown;
-        } else {
-          reply = processIntent(intent, message, entities);
+          console.log("Low confidence: " + confidence);
+          intent = 'unknown';
         }
-        return resolve(R.merge(bundle, {
-          reply: reply
-        }));
+        return processIntent(intent, message, entities).then(function(reply) {
+          log(reply);
+          return resolve(R.merge(bundle, {
+            reply: reply
+          }));
+        });
       };
     })(this));
   };

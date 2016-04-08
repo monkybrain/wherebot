@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/monkybrain/wherebot#readme",
   "dependencies": {
+    "date.js": "^0.3.1",
     "firebase": "^2.4.2",
     "node-wit": "^2.0.0",
     "promise": "^7.1.1",
