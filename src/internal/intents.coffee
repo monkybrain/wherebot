@@ -25,7 +25,7 @@ exports.intents =
       # Initialize reply array
       reply = [replies.intents.set_self_status]
 
-      # If 'back' specified
+      # [?] If 'back' specified
       if entities.back?
 
         # -> Update 'back'

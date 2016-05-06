@@ -3,13 +3,17 @@ Promise = require 'promise'
 R = require 'ramda'
 Rx = require 'rx'
 
-
 # My modules
 {dot, method} = require '../misc/helpers'
 {log} = require '../misc/util'
 
-base = new Firebase 'https://werebot.firebaseio.com/'
-teams = base.child 'teams'
+# Firebase - Getters
+{getBase, getChild, getValue, getValueWithDefault} = require './abstractions/firebase'
+# Firebase - Setters
+{setValue} = require './abstractions/firebase'
+
+base = getBase 'https://werebot.firebaseio.com'
+teams = getChild 'teams', base
 
 ### PRIVATE ###
 
@@ -19,7 +23,6 @@ getUserId = dot('user')
 getStatus = dot('status')
 
 # Handle refs and children
-getChild = R.curry (name, ref) -> ref.child(name)
 getUserRef = (message) -> teams.child(getTeamId(message)).child('users/' + getUserId(message))
 getTeamRef = R.pipe getTeamId, getChild(teams)
 getUserStateRef = R.pipe getUserRef, getChild('state')
@@ -28,25 +31,7 @@ getUserBackRef = R.pipe getUserRef, getChild('back')
 getUserBackDateTimeRef = R.pipe getUserRef, getChild('backDateTime')
 
 # GET
-# Firebase Ref -> Snapshot
-getSnapshot = (ref) -> ref.once 'value'
-
-# Snapshot to value (Firebase Snapshot -> Object)
-snapshotToValue = (snapshot) -> snapshot.val()
-
-# Get Value (Firebase Ref -> Object)
-getValue = R.pipeP getSnapshot, snapshotToValue
-
 addId = (value, message) -> R.merge value, id: getUserId(message) # To be implemented
-
-defaultTo = R.curry (defaultValue, val) -> if not val? then defaultValue else val
-
-# Get Value With Default (Firebase Ref -> String -> String)
-getValueWithDefault = (defaultValue) -> R.pipeP getValue, defaultTo(defaultValue)
-
-# SET helpers
-# setValue = (value, ref) -> ref.set value
-setValue = R.curry (value, ref) -> ref.set value
 
 # MISC helpers
 makeUserObject = (userId, snapshot) ->
